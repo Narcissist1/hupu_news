@@ -1,4 +1,7 @@
 from .config import config
+import aiohttp
+import asyncio
+import feedparser
 
 
 def gen_load_rss_source():
@@ -7,6 +10,18 @@ def gen_load_rss_source():
             if line:
                 # remove '/n'
                 yield line[:-1]
+
+
+async def fetch_data(url):
+    async with aiohttp.ClientSession().get(url) as resp:
+        if resp.status == 200:
+            return await resp.text()
+
+
+async def parser_rss(url):
+    content = await fetch_data(url)
+    feed = feedparser.parse(content)
+    return feed
 
 
 if __name__ == '__main__':
